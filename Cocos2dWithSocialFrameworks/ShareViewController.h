@@ -10,6 +10,4 @@
 
 @interface ShareViewController : UIViewController
 
-+(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil image:(UIImage *)image;
-
 @end

@@ -11,6 +11,8 @@
 #import "AppDelegate.h"
 #import "IntroLayer.h"
 
+#import <FacebookSDK/FacebookSDK.h>
+
 @implementation MyNavigationController
 
 // The available orientations should be defined in the Info.plist file.
@@ -56,6 +58,46 @@
 @implementation AppController
 
 @synthesize window=window_, navController=navController_, director=director_;
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+    
+    // Facebook SDK * login flow *
+    // Attempt to handle URLs to complete any auth (e.g., SSO) flow.
+    return [FBAppCall handleOpenURL:url sourceApplication:sourceApplication fallbackHandler:^(FBAppCall *call) {
+        // Facebook SDK * App Linking *
+        // For simplicity, this sample will ignore the link if the session is already
+        // open but a more advanced app could support features like user switching.
+        if (call.accessTokenData) {
+            if ([FBSession activeSession].isOpen) {
+                NSLog(@"INFO: Ignoring app link because current session is open.");
+            }
+            else {
+                [self handleAppLink:call.accessTokenData];
+            }
+        }
+    }];
+}
+
+// Helper method to wrap logic for handling app links.
+- (void)handleAppLink:(FBAccessTokenData *)appLinkToken {
+    // Initialize a new blank session instance...
+    FBSession *appLinkSession = [[FBSession alloc] initWithAppID:nil
+                                                     permissions:nil
+                                                 defaultAudience:FBSessionDefaultAudienceNone
+                                                 urlSchemeSuffix:nil
+                                              tokenCacheStrategy:[FBSessionTokenCachingStrategy nullCacheInstance] ];
+    [FBSession setActiveSession:appLinkSession];
+    // ... and open it from the App Link's Token.
+    [appLinkSession openFromAccessTokenData:appLinkToken
+                          completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+                              // Forward any errors to the FBLoginView delegate.
+                              if (error) {
+                              }
+                          }];
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -126,7 +168,7 @@
 	// Create a Navigation Controller with the Director
 	navController_ = [[MyNavigationController alloc] initWithRootViewController:director_];
 	navController_.navigationBarHidden = YES;
-
+	
 	// for rotation and other messages
 	[director_ setDelegate:navController_];
 	
@@ -149,9 +191,11 @@
 // call got rejected
 -(void) applicationDidBecomeActive:(UIApplication *)application
 {
-	[[CCDirector sharedDirector] setNextDeltaTimeZero:YES];	
+	[[CCDirector sharedDirector] setNextDeltaTimeZero:YES];
 	if( [navController_ visibleViewController] == director_ )
 		[director_ resume];
+    [FBAppEvents activateApp];
+    [FBAppCall handleDidBecomeActive];
 }
 
 -(void) applicationDidEnterBackground:(UIApplication*)application
@@ -169,6 +213,7 @@
 // application will be killed
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    [[FBSession activeSession] close];
 	CC_DIRECTOR_END();
 }
 

@@ -34,14 +34,14 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb582170648513304</string>
+				<string>fb149410691936059</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>FacebookAppID</key>
-	<string>582170648513304</string>
+	<string>149410691936059</string>
 	<key>FacebookDisplayName</key>
 	<string>Cocos2d With Social Frameworks</string>
 	<key>LSRequiresIPhoneOS</key>

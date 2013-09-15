@@ -19,6 +19,7 @@
 // HelloWorldLayer implementation
 
 #define FB_LOGOUT @"log out"
+#define POST_ID @"post_id"
 
 @interface HelloWorldLayer()<UIActionSheetDelegate>
 {
@@ -121,6 +122,27 @@
 		}];
 		
 		CCMenuItem *feedDialogShare = [CCMenuItemFont itemWithString:@"feed Dialog Share" block:^(id sender) {
+			NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+										   @"Cocos2d With Social Frameworks", @"name",
+										   @"This area is for caption", @"caption",
+										   @"Testing Facebook feed Dialog", @"descprition",nil];
+			[FBWebDialogs presentFeedDialogModallyWithSession:nil parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+				if (error) {
+					NSLog(@"Error Launching the dialog or publishing a story");
+				}else{
+					if (result == FBWebDialogResultDialogNotCompleted) {
+						NSLog(@"User clicked the x icon");
+					}else{
+						NSDictionary *urlParams = [self parseURLParams:[resultURL query]];
+						if (![urlParams valueForKey:POST_ID]) {
+							NSLog(@"User clicked calceled sotry publishing");
+						}else{
+							NSString *message = [NSString stringWithFormat:@"Post story, id %@", [urlParams valueForKey:POST_ID]];
+							[[[UIAlertView alloc] initWithTitle:@"Result" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil] show];
+						}
+					}
+				}
+			}];
 		}];
 		
 		
@@ -136,6 +158,11 @@
 		
 	}
 	return self;
+}
+
+-(NSDictionary *)parseURLParams:(NSString *)query
+{
+	return nil;
 }
 
 -(void)updateButtons

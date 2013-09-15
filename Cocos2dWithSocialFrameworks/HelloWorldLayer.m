@@ -13,6 +13,7 @@
 // Needed to obtain the Navigation Controller
 #import "AppDelegate.h"
 #import <FacebookSDK/FacebookSDK.h>
+#import "ShareViewController.h"
 
 #pragma mark - HelloWorldLayer
 
@@ -145,15 +146,27 @@
 			}];
 		}];
 		
+		CCMenuItem *PublishFeed = [CCMenuItemFont itemWithString:@"feed Dialog Share" block:^(id sender) {
+			ShareViewController *shareViewController = [[ShareViewController alloc] initWithNibName:@"ShareViewController" bundle:nil];
+			[[CCDirector sharedDirector] presentModalViewController:shareViewController animated:YES];
+		}];
 		
+		CCMenu *faceBookLoginMenu = [CCMenu menuWithItems:self.fbLogin, nil];
+		faceBookLoginMenu.position = CGPointZero;
+		[faceBookLoginMenu setPosition:ccp(winSize.width/2, winSize.height - 50)];
 		
-		CCMenu *menu = [CCMenu menuWithItems:self.fbLogin, shareSheet, feedDialogShare, nil];
+		CCMenu *menu = [CCMenu menuWithItems:shareSheet, feedDialogShare, nil];
+		[menu alignItemsHorizontallyWithPadding:50];
+		[menu setPosition:ccp(winSize.width/2, winSize.height/2 + 50)];
 		
-		[menu alignItemsHorizontallyWithPadding:20];
-		[menu setPosition:ccp(winSize.width/2, winSize.height/2 - 50)];
+		CCMenu *menu1 = [CCMenu menuWithItems:PublishFeed, nil];
+		[menu1 alignItemsHorizontallyWithPadding:50];
+		[menu1 setPosition:ccp(winSize.width/2, winSize.height/2)];
 		
 		// Add the menu to the layer
+		[self addChild:faceBookLoginMenu];
 		[self addChild:menu];
+		[self addChild:menu1];
         [self updateButtons];
 		
 	}

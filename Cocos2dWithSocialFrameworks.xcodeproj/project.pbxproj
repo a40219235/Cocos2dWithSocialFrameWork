@@ -141,6 +141,7 @@
 		2A6FB78417E57B76001F4ECA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A6FB78317E57B76001F4ECA /* AppDelegate.m */; };
 		2A6FB78717E57B76001F4ECA /* HelloWorldLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A6FB78617E57B76001F4ECA /* HelloWorldLayer.m */; };
 		2A6FB78A17E57B76001F4ECA /* IntroLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A6FB78917E57B76001F4ECA /* IntroLayer.m */; };
+		2A6FB79117E57D61001F4ECA /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A6FB79017E57D61001F4ECA /* FacebookSDK.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -425,6 +426,7 @@
 		2A6FB78617E57B76001F4ECA /* HelloWorldLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelloWorldLayer.m; sourceTree = "<group>"; };
 		2A6FB78817E57B76001F4ECA /* IntroLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntroLayer.h; sourceTree = "<group>"; };
 		2A6FB78917E57B76001F4ECA /* IntroLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IntroLayer.m; sourceTree = "<group>"; };
+		2A6FB79017E57D61001F4ECA /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -442,6 +444,7 @@
 				2A6FB5EC17E57B74001F4ECA /* CoreGraphics.framework in Frameworks */,
 				2A6FB5EE17E57B74001F4ECA /* CoreText.framework in Frameworks */,
 				2A6FB5F017E57B74001F4ECA /* GameKit.framework in Frameworks */,
+				2A6FB79117E57D61001F4ECA /* FacebookSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,6 +471,7 @@
 		2A6FB5DC17E57B74001F4ECA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2A6FB79017E57D61001F4ECA /* FacebookSDK.framework */,
 				2A6FB5DD17E57B74001F4ECA /* QuartzCore.framework */,
 				2A6FB5DF17E57B74001F4ECA /* OpenGLES.framework */,
 				2A6FB5E117E57B74001F4ECA /* OpenAL.framework */,
@@ -1115,11 +1119,16 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Cocos2dWithSocialFrameworks/Prefix.pch;
 				HEADER_SEARCH_PATHS = "\"Cocos2dWithSocialFrameworks/libs/kazmath/include\"";
 				INFOPLIST_FILE = Cocos2dWithSocialFrameworks/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
@@ -1135,10 +1144,15 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Cocos2dWithSocialFrameworks/Prefix.pch;
 				HEADER_SEARCH_PATHS = "\"Cocos2dWithSocialFrameworks/libs/kazmath/include\"";
 				INFOPLIST_FILE = Cocos2dWithSocialFrameworks/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",

@@ -13,7 +13,7 @@
 // Needed to obtain the Navigation Controller
 #import "AppDelegate.h"
 #import <FacebookSDK/FacebookSDK.h>
-#import "ShareViewController.h"
+#import "ShareView.h"
 
 #pragma mark - HelloWorldLayer
 
@@ -147,8 +147,12 @@
 		}];
 		
 		CCMenuItem *PublishFeed = [CCMenuItemFont itemWithString:@"feed Dialog Share" block:^(id sender) {
-			ShareViewController *shareViewController = [[ShareViewController alloc] initWithNibName:@"ShareViewController" bundle:nil];
-			[[CCDirector sharedDirector] presentModalViewController:shareViewController animated:YES];
+			CCScene *scene = [[CCDirector sharedDirector] runningScene];
+			CCNode *n = [scene.children objectAtIndex:0];
+			UIImage *img = [self screenshotWithStartNode:n];
+			
+			ShareView *shareView = [ShareView initWithNibName:@"ShareView" bundle:nil image:img];
+			[[CCDirector sharedDirector] presentModalViewController:shareView animated:YES];
 		}];
 		
 		CCMenu *faceBookLoginMenu = [CCMenu menuWithItems:self.fbLogin, nil];
@@ -171,6 +175,21 @@
 		
 	}
 	return self;
+}
+
+-(UIImage*) screenshotWithStartNode:(CCNode*)startNode
+{
+    [CCDirector sharedDirector].nextDeltaTimeZero = YES;
+	
+    CGSize winSize = [CCDirector sharedDirector].winSize;
+    CCRenderTexture* rtx =
+    [CCRenderTexture renderTextureWithWidth:winSize.width
+									 height:winSize.height];
+    [rtx begin];
+    [startNode visit];
+    [rtx end];
+	
+    return [rtx getUIImage];
 }
 
 -(NSDictionary *)parseURLParams:(NSString *)query

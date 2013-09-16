@@ -108,7 +108,6 @@
             }];
         }
         
-		// Leaderboard Menu Item using blocks
 		CCMenuItem *shareSheet = [CCMenuItemFont itemWithString:@"iOS shareSheet" block:^(id sender) {
 			[FBDialogs presentOSIntegratedShareDialogModallyFrom:[CCDirector sharedDirector] initialText:@"init text" image:nil url:nil handler:^(FBOSIntegratedShareDialogResult result, NSError *error) {
 				NSString *alertText = @"";
@@ -194,7 +193,21 @@
 
 -(NSDictionary *)parseURLParams:(NSString *)query
 {
-	return nil;
+
+//	NSLog(@"query = %@", [query description]);
+	NSArray *pairs = [query componentsSeparatedByString:@"&"];
+//	NSLog(@"pair = %@", [pairs description]);
+	NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+	[pairs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+		NSString *stringObject = (NSString *)obj;
+		NSArray *keyValue = [stringObject componentsSeparatedByString:@"="];
+//		NSLog(@"kv = %@", [keyValue description]);
+		NSString *value = [keyValue[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//		NSLog(@"val = %@", value);
+		params[keyValue[0]] = value;
+	}];
+//	NSLog(@"params = %@", [params description]);
+	return params;
 }
 
 -(void)updateButtons

@@ -10,6 +10,7 @@
 
 @interface ShareView ()
 
+@property (weak, nonatomic)UIImage* postimage;
 @end
 
 @implementation ShareView
@@ -23,7 +24,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-		self.postImageView.image = image;
+		self.postimage = image;
 		if (!image) NSLog(@"image = nil");
 		if (!self.postImageView) NSLog(@"image = nil");
 		if (!self.postImageView.image) NSLog(@"image = nil");
@@ -37,6 +38,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+//	self.postImageView.image = self.postimage;
 }
 
 - (void)didReceiveMemoryWarning

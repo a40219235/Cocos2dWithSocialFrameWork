@@ -107,12 +107,6 @@
             }
             
 		}];
-		
-        NSLog(@"accessTokenData = %@", [[FBSession activeSession].accessTokenData description]);
-        NSLog(@"111111 = %f", [[FBSession activeSession].accessTokenData.expirationDate timeIntervalSinceNow]);
-        NSLog(@"222222 = %f", [[FBSession activeSession].accessTokenData.expirationDate timeIntervalSince1970]);
-        NSLog(@"333333 = %f", [[FBSession activeSession].accessTokenData.expirationDate timeIntervalSinceReferenceDate]);
-        NSLog(@"111111 = %f", CACurrentMediaTime());
         
 		CCMenuItem *shareSheet = [CCMenuItemFont itemWithString:@"iOS shareSheet" block:^(id sender) {
 			CCScene *scene = [[CCDirector sharedDirector] runningScene];
@@ -158,14 +152,7 @@
 			}];
 		}];
 		
-		CCMenuItem *screenShot= [CCMenuItemFont itemWithString:@"Screen Shot upload" block:^(id sender) {
-			CCScene *scene = [[CCDirector sharedDirector] runningScene];
-			CCNode *n = [scene.children objectAtIndex:0];
-			UIImage *screenShotImage = [self screenshotWithStartNode:n];
-			UIImageWriteToSavedPhotosAlbum(screenShotImage, self, nil, NULL);
-		}];
-		
-		CCMenuItem *PublishFeed = [CCMenuItemFont itemWithString:@"Publish Feed" block:^(id sender) {
+		CCMenuItem *screenShotUpload = [CCMenuItemFont itemWithString:@"take a screenshot and upload" block:^(id sender) {
 			CCScene *scene = [[CCDirector sharedDirector] runningScene];
 			CCNode *n = [scene.children objectAtIndex:0];
 			UIImage *img = [self screenshotWithStartNode:n];
@@ -182,7 +169,7 @@
 		[menu alignItemsHorizontallyWithPadding:50];
 		[menu setPosition:ccp(winSize.width/2, winSize.height/2 - 75)];
 		
-		CCMenu *menu1 = [CCMenu menuWithItems:PublishFeed, screenShot, nil];
+		CCMenu *menu1 = [CCMenu menuWithItems:screenShotUpload, nil];
 		[menu1 alignItemsHorizontallyWithPadding:50];
 		[menu1 setPosition:ccp(winSize.width/2, winSize.height/2 - 125)];
 		

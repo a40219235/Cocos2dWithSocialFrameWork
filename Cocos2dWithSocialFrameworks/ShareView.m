@@ -61,7 +61,7 @@
 - (void)viewDidUnload {
 	[self setPostImageView:nil];
 	[self setShareButtonOutlet:nil];
-	[self setPhotoDescriptionLabel:nil];
+	[self setNameTextField:nil];
     [super viewDidUnload];
 }
 
@@ -71,13 +71,18 @@
 }
 
 - (IBAction)ShareButton:(UIBarButtonItem *)sender {
-	if ([self.photoDescriptionLabel isFirstResponder]) {
-		[self.photoDescriptionLabel resignFirstResponder];
+	if ([self.nameTextField isFirstResponder]) {
+		[self.nameTextField resignFirstResponder];
 	}
 	
 	sender.enabled = NO;
-
-	self.postParams[@"name"] = self.photoDescriptionLabel.text;
+	
+	if (![self.nameTextField.text length]) {
+		self.postParams[@"name"] = self.nameTextField.placeholder;
+	}else{
+		self.postParams[@"name"] = self.nameTextField.text;
+	}
+	
 
 	if([[FBSession activeSession].permissions indexOfObject:@"publish_actions"] == NSNotFound){
 		[[FBSession activeSession] requestNewPublishPermissions:@[@"publish_actions"] defaultAudience:FBSessionDefaultAudienceFriends completionHandler:^(FBSession *session, NSError *error) {
@@ -138,8 +143,7 @@
 
 - (void)resetPostMessage
 {
-    self.photoDescriptionLabel.text = kPLACE_HOLDER_STRING;
-    self.photoDescriptionLabel.textColor = [UIColor lightGrayColor];
+	self.nameTextField.placeholder = kPLACE_HOLDER_STRING;
 }
 
 #pragma mark - rotation
@@ -154,10 +158,10 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *) event
 {
     UITouch *touch = [[event allTouches] anyObject];
-    if ([self.photoDescriptionLabel isFirstResponder] &&
-        (self.photoDescriptionLabel != touch.view))
+    if ([self.nameTextField isFirstResponder] &&
+        (self.nameTextField != touch.view))
     {
-        [self.photoDescriptionLabel resignFirstResponder];
+        [self.nameTextField resignFirstResponder];
     }
 }
 

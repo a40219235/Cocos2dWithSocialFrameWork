@@ -62,8 +62,26 @@
 		
 		[CCMenuItemFont setFontSize:28];
 		
+		CCSprite * background = [CCSprite spriteWithFile:@"Default-Landscape~ipad.png"];
+		background.scale = 0.5;
+		[self addChild:background];
+		background.position = ccp(winSize.width/2, winSize.height/2);
+		
 		// to avoid a retain-cycle with the menuitem and blocks
 		__block id copy_self = self;
+		
+		//check if token authenticate
+		if (![[FBSession activeSession] isOpen]&&[FBSession activeSession].accessTokenData && [[FBSession activeSession].accessTokenData.expirationDate timeIntervalSinceNow] > 0) {
+            [FBSession openActiveSessionWithReadPermissions:nil allowLoginUI:NO completionHandler:^(FBSession *session, FBSessionState status, NSError *error){
+                NSLog(@"session = %@", [session description]);
+                NSLog(@"error = %@", [error description]);
+                if (session.isOpen) {
+                    [copy_self updateButtons];
+                }else{
+                    [copy_self updateButtons];
+                }
+            }];
+        }
 		
 		self.fbLogin = [CCMenuItemFont itemWithString:@"fbLogin" block:^(CCMenuItemFont *sender) {
             NSLog(@"open1 = %s",[[FBSession activeSession] isOpen] ? "Yes":"No" );
@@ -96,26 +114,21 @@
         NSLog(@"333333 = %f", [[FBSession activeSession].accessTokenData.expirationDate timeIntervalSinceReferenceDate]);
         NSLog(@"111111 = %f", CACurrentMediaTime());
         
-        if (![[FBSession activeSession] isOpen]&&[FBSession activeSession].accessTokenData && [[FBSession activeSession].accessTokenData.expirationDate timeIntervalSinceNow] > 0) {
-            [FBSession openActiveSessionWithReadPermissions:nil allowLoginUI:NO completionHandler:^(FBSession *session, FBSessionState status, NSError *error){
-                NSLog(@"session = %@", [session description]);
-                NSLog(@"error = %@", [error description]);
-                if (session.isOpen) {
-                    [copy_self updateButtons];
-                }else{
-                    [copy_self updateButtons];
-                }
-            }];
-        }
-        
 		CCMenuItem *shareSheet = [CCMenuItemFont itemWithString:@"iOS shareSheet" block:^(id sender) {
-			[FBDialogs presentOSIntegratedShareDialogModallyFrom:[CCDirector sharedDirector] initialText:@"init text" image:nil url:nil handler:^(FBOSIntegratedShareDialogResult result, NSError *error) {
+			CCScene *scene = [[CCDirector sharedDirector] runningScene];
+			CCNode *n = [scene.children objectAtIndex:0];
+			UIImage *screenShotImage = [self screenshotWithStartNode:n];
+			
+			[FBDialogs presentOSIntegratedShareDialogModallyFrom:[CCDirector sharedDirector] initialText:@"init text" image:screenShotImage url:nil handler:^(FBOSIntegratedShareDialogResult result, NSError *error) {
 				NSString *alertText = @"";
 				if ([[error userInfo][FBErrorDialogReasonKey] isEqualToString:FBErrorDialogNotSupported]) {
 					alertText = @"iOS Share Sheet not supported.";
 				}else if (error) {
 					alertText = [NSString stringWithFormat:@"error: domain = %@, code = %d", error.domain, error.code];
 				}else if (result == FBNativeDialogResultSucceeded){
+					alertText = @"Posted successfully";
+				}
+				if (![alertText isEqualToString:@""]) {
 					[[[UIAlertView alloc] initWithTitle:@"Result" message:alertText delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil] show];
 				}
 			}];
@@ -145,11 +158,18 @@
 			}];
 		}];
 		
-		CCMenuItem *PublishFeed = [CCMenuItemFont itemWithString:@"feed Dialog Share" block:^(id sender) {
+		CCMenuItem *screenShot= [CCMenuItemFont itemWithString:@"Screen Shot upload" block:^(id sender) {
+			CCScene *scene = [[CCDirector sharedDirector] runningScene];
+			CCNode *n = [scene.children objectAtIndex:0];
+			UIImage *screenShotImage = [self screenshotWithStartNode:n];
+			UIImageWriteToSavedPhotosAlbum(screenShotImage, self, nil, NULL);
+		}];
+		
+		CCMenuItem *PublishFeed = [CCMenuItemFont itemWithString:@"Publish Feed" block:^(id sender) {
 			CCScene *scene = [[CCDirector sharedDirector] runningScene];
 			CCNode *n = [scene.children objectAtIndex:0];
 			UIImage *img = [self screenshotWithStartNode:n];
-			
+
 			ShareView *shareView = [ShareView initWithNibName:@"ShareView" bundle:nil image:img];
 			[[CCDirector sharedDirector] presentModalViewController:shareView animated:YES];
 		}];
@@ -160,11 +180,11 @@
 		
 		CCMenu *menu = [CCMenu menuWithItems:shareSheet, feedDialogShare, nil];
 		[menu alignItemsHorizontallyWithPadding:50];
-		[menu setPosition:ccp(winSize.width/2, winSize.height/2 + 50)];
+		[menu setPosition:ccp(winSize.width/2, winSize.height/2 - 75)];
 		
-		CCMenu *menu1 = [CCMenu menuWithItems:PublishFeed, nil];
+		CCMenu *menu1 = [CCMenu menuWithItems:PublishFeed, screenShot, nil];
 		[menu1 alignItemsHorizontallyWithPadding:50];
-		[menu1 setPosition:ccp(winSize.width/2, winSize.height/2)];
+		[menu1 setPosition:ccp(winSize.width/2, winSize.height/2 - 125)];
 		
 		// Add the menu to the layer
 		[self addChild:faceBookLoginMenu];
@@ -189,6 +209,17 @@
     [rtx end];
 	
     return [rtx getUIImage];
+}
+
+-(void)printOutOddNumbers
+{
+    for(int i = 1; i < 100; i ++)
+    {
+        if(i % 2 != 0)
+        {
+            NSLog(@"%d", i);
+        }
+    }
 }
 
 -(NSDictionary *)parseURLParams:(NSString *)query

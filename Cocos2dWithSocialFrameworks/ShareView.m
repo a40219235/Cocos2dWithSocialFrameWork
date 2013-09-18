@@ -7,11 +7,17 @@
 //
 
 #import "ShareView.h"
+#import <FacebookSDK/FacebookSDK.h>
 
-@interface ShareView ()
+@interface ShareView () <UITextViewDelegate>
 
-@property (weak, nonatomic)UIImage* postimage;
+@property (nonatomic, weak)UIImage* postimage;
+@property (nonatomic, strong) NSMutableDictionary *postParams;
+@property (nonatomic, strong) NSString *postImageURL;
+
 @end
+
+#define kPLACE_HOLDER_STRING @"I Love Cocos2d"
 
 @implementation ShareView
 
@@ -25,10 +31,11 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
 		self.postimage = image;
-		if (!image) NSLog(@"image = nil");
-		if (!self.postImageView) NSLog(@"image = nil");
-		if (!self.postImageView.image) NSLog(@"image = nil");
-		self.postText.text = @"nimasile";
+		self.postParams = [@{
+						   @"picture" : @"",
+						   @"name" : @"",
+						   } mutableCopy];
+		
         // Custom initialization
     }
     return self;
@@ -38,7 +45,11 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-//	self.postImageView.image = self.postimage;
+	if (self.postimage) {
+		self.postImageView.image = self.postimage;
+	}
+	[self.postParams setObject:UIImagePNGRepresentation(self.postImageView.image) forKey:@"picture"];
+	[self resetPostMessage];
 }
 
 - (void)didReceiveMemoryWarning
@@ -49,17 +60,106 @@
 
 - (void)viewDidUnload {
 	[self setPostImageView:nil];
-	[self setPostNameLabel:nil];
-	[self setPostNameLabel:nil];
-	[self setPostCaptionLabel:nil];
-	[self setPostDescriptionLabel:nil];
+	[self setShareButtonOutlet:nil];
+	[self setPhotoDescriptionLabel:nil];
     [super viewDidUnload];
 }
 
-#pragma Action Button 
+#pragma Action Button
 - (IBAction)CancelButton:(UIBarButtonItem *)sender {
+	[[self presentingViewController] dismissModalViewControllerAnimated:YES];
 }
 
-- (IBAction)ShareButton:(id)sender {
+- (IBAction)ShareButton:(UIBarButtonItem *)sender {
+	if ([self.photoDescriptionLabel isFirstResponder]) {
+		[self.photoDescriptionLabel resignFirstResponder];
+	}
+	
+	sender.enabled = NO;
+
+	self.postParams[@"name"] = self.photoDescriptionLabel.text;
+
+	if([[FBSession activeSession].permissions indexOfObject:@"publish_actions"] == NSNotFound){
+		[[FBSession activeSession] requestNewPublishPermissions:@[@"publish_actions"] defaultAudience:FBSessionDefaultAudienceFriends completionHandler:^(FBSession *session, NSError *error) {
+			if (!error){
+				[self publishStory:sender];
+			}
+		}];
+	}else{
+		[self publishStory:sender];
+	}
 }
+
+#pragma mark - fbPosting Methods
+
+-(void)publishStory:(UIBarButtonItem *)shareButton
+{
+//	NSLog(@"Params = %@", [self.postParams description]);
+	[FBRequestConnection startWithGraphPath:@"me/photos" parameters:self.postParams HTTPMethod:@"POST" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+		if (!error) {
+			NSString *alertText;
+			if (error) {
+				alertText = [NSString stringWithFormat:
+							 @"error: domain = %@, code = %d",
+							 error.domain, error.code];
+			} else {
+				alertText = @"Post Success";
+			}
+			// Show the result in an alert
+			[[[UIAlertView alloc] initWithTitle:@"Result"
+										message:alertText
+									   delegate:self
+							  cancelButtonTitle:@"OK!"
+							  otherButtonTitles:nil]
+			 show];
+		}else{
+			NSLog(@"error = %@", [error localizedDescription]);
+		}
+		shareButton.enabled = YES;
+	}];
+}
+
+#pragma mark - UITextViewDelegate methods
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
+    // Clear the message text when the user starts editing
+    if ([textView.text isEqualToString:kPLACE_HOLDER_STRING]) {
+        textView.text = @"";
+        textView.textColor = [UIColor blackColor];
+    }
+}
+
+- (void)textViewDidEndEditing:(UITextView *)textView
+{
+    if ([textView.text isEqualToString:@""]) {
+        [self resetPostMessage];
+    }
+}
+
+- (void)resetPostMessage
+{
+    self.photoDescriptionLabel.text = kPLACE_HOLDER_STRING;
+    self.photoDescriptionLabel.textColor = [UIColor lightGrayColor];
+}
+
+#pragma mark - rotation
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
+	if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft || toInterfaceOrientation == UIInterfaceOrientationLandscapeRight) {
+		return YES;
+	}
+	return NO;
+}
+
+#pragma mark - touch event
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *) event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    if ([self.photoDescriptionLabel isFirstResponder] &&
+        (self.photoDescriptionLabel != touch.view))
+    {
+        [self.photoDescriptionLabel resignFirstResponder];
+    }
+}
+
+
 @end

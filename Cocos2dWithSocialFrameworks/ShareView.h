@@ -10,10 +10,8 @@
 
 @interface ShareView : UIViewController
 @property (weak, nonatomic) IBOutlet UIImageView *postImageView;
-@property (weak, nonatomic) IBOutlet UITextView *postText;
-@property (weak, nonatomic) IBOutlet UILabel *postNameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *postCaptionLabel;
-@property (weak, nonatomic) IBOutlet UILabel *postDescriptionLabel;
+@property (weak, nonatomic) IBOutlet UIToolbar *shareButtonOutlet;
+@property (weak, nonatomic) IBOutlet UILabel *photoDescriptionLabel;
 
 - (IBAction)CancelButton:(UIBarButtonItem *)sender;
 - (IBAction)ShareButton:(UIBarButtonItem *)sender;

@@ -198,17 +198,6 @@
     return [rtx getUIImage];
 }
 
--(void)printOutOddNumbers
-{
-    for(int i = 1; i < 100; i ++)
-    {
-        if(i % 2 != 0)
-        {
-            NSLog(@"%d", i);
-        }
-    }
-}
-
 -(NSDictionary *)parseURLParams:(NSString *)query
 {
 
